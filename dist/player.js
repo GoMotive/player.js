@@ -1194,7 +1194,10 @@ var Player = function () {
 
                 getOEmbedData(url, params).then(function (data) {
                     var iframe = createEmbed(data, element);
+                    // Overwrite element with the new iframe,
+                    // but store reference to the original element
                     _this.element = iframe;
+                    _this._originalElement = element;
 
                     swapCallbacks(element, iframe);
                     playerMap.set(_this.element, _this);
@@ -1610,6 +1613,10 @@ var Player = function () {
             return new npo_src(function (resolve) {
                 readyMap.delete(_this5);
                 playerMap.delete(_this5.element);
+                if (_this5._originalElement) {
+                    playerMap.delete(_this5._originalElement);
+                    _this5._originalElement.removeAttribute('data-vimeo-initialized');
+                }
                 if (_this5.element && _this5.element.nodeName === 'IFRAME') {
                     _this5.element.remove();
                 }
