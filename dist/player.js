@@ -1420,7 +1420,9 @@ var Player = function () {
     }, {
         key: 'ready',
         value: function ready() {
-            var readyPromise = readyMap.get(this);
+            var readyPromise = readyMap.get(this) || new npo_src(function (resolve, reject) {
+                reject('Unknown player. Probably unloaded.');
+            });
             return npo_src.resolve(readyPromise);
         }
 
@@ -1589,6 +1591,30 @@ var Player = function () {
         key: 'unload',
         value: function unload() {
             return this.callMethod('unload');
+        }
+
+        /**
+         * Cleanup the player and remove it from the DOM
+         *
+         * It won't be usable and a new one should be constructed
+         *  in order to do any operations.
+         *
+         * @return {Promise}
+         */
+
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            var _this5 = this;
+
+            return new npo_src(function (resolve) {
+                readyMap.delete(_this5);
+                playerMap.delete(_this5.element);
+                if (_this5.element && _this5.element.nodeName === 'IFRAME') {
+                    _this5.element.remove();
+                }
+                resolve();
+            });
         }
 
         /**
